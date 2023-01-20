@@ -1,0 +1,15 @@
+{
+    "name": "samiu/error",
+    "autoload": {
+        "psr-4": {
+            "ERROR\\Inc\\": "inc/"
+        }
+    },
+    "authors": [
+        {
+            "name": "sabbirsam",
+            "email": "samiubat14@gmail.com"
+        }
+    ],
+    "require": {}
+}
