@@ -1,26 +1,4 @@
 <?php
-/**
- * Plugin Name: WP Error Log
- *
- * @author            Sabbir Sam, devsabbirahmed
- * @copyright         2022- devsabbirahmed
- * @license           GPL-2.0-or-later
- *
- * @wordpress-plugin
- * Plugin Name: WP Error Log
- * Plugin URI: https://github.com/sabbirsam/Admin-Chat-Box/tree/free
- * Description: Logs JavaScript and PHP errors to a file and displays them on a page
- * Version:           1.0.0
- * Requires at least: 5.9 or higher
- * Requires PHP:      5.4 or higher
- * Author:            SABBIRSAM
- * Author URI:        https://github.com/sabbirsam/
- * Text Domain:       acb
- * Domain Path: /languages/
- * License:           GPL v2 or later
- * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- * 
- */
 
 defined('ABSPATH') or die('Hey, what are you doing here? You silly human!');
 
@@ -28,25 +6,22 @@ if (file_exists(dirname(__FILE__).'/vendor/autoload.php')) {
     require_once dirname(__FILE__).'/vendor/autoload.php';
 }
 
-use ERROR\Inc\ERR_Activate;
-use ERROR\Inc\ERR_Deactivate;
-
 /**
  * Main Class
  */
 if(!class_exists('ERR_Error')){
-    class ERR_Error{
+    class ERR_Errorsssss{
         public function __construct(){
             $this->includes();
             // add_action( 'wp_head', array( $this, 'log_javascript_errors' ) );
             // set_error_handler( array( $this, 'log_php_errors' ) );
-            add_action( 'admin_menu', array( $this, 'add_error_page' ) );
+            // add_action( 'admin_menu', array( $this, 'add_error_page' ) );
         }
         /**
          * Register
          */
         function register(){
-            add_action("plugins_loaded", array( $this, 'err_load' )); 
+            // add_action("plugins_loaded", array( $this, 'err_load' )); 
         }
         /**
          * Language load
@@ -160,23 +135,11 @@ if(!class_exists('ERR_Error')){
             
         }
     
-        /**
-         * Activation Hook
-         */
-        function err_activate(){   
-            ERR_Activate::err_activate();
-        }
-        /**
-         * Deactivation Hook
-         */
-        function err_deactivate(){ 
-            ERR_Deactivate::err_deactivate(); 
-        }
     }
     /**
      * Instantiate an Object Class 
      */
-    $err = new ERR_Error;
+    $err = new ERR_Errorsssss;
     register_activation_hook (__FILE__, array( $err, 'err_activate' ) );
     register_deactivation_hook (__FILE__, array( $err, 'err_deactivate' ) );
 }

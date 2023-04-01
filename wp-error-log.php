@@ -38,15 +38,14 @@ if(!class_exists('ERR_Error')){
     class ERR_Error{
         public function __construct(){
             $this->includes();
-            // add_action( 'wp_head', array( $this, 'log_javascript_errors' ) );
-            // set_error_handler( array( $this, 'log_php_errors' ) );
             add_action( 'admin_menu', array( $this, 'add_error_page' ) );
+            add_action( 'admin_bar_menu', array( $this, 'add_my_page_to_admin_bar' ), 100 );
         }
         /**
          * Register
          */
         function register(){
-            add_action("plugins_loaded", array( $this, 'err_load' )); 
+            add_action("plugins_loaded", array( $this, 'err_load' ));  
         }
         /**
          * Language load
@@ -60,42 +59,7 @@ if(!class_exists('ERR_Error')){
         public function includes() {
 
         }
-        /**
-         * log_javascript_errors : Javascript Error
-         */
-        /* public function log_javascript_errors() {
-            ?>
-            <script>
-                window.onerror = function( message, url, lineNumber, columnNumber, error ) {
-                    var data = {
-                        'message': message,
-                        'url': url,
-                        'line': lineNumber,
-                        'column': columnNumber,
-                        'error': error
-                    };
-                    var xhr = new XMLHttpRequest();
-                    xhr.open( 'POST', '<?php echo admin_url( 'admin-ajax.php' ); ?>' );
-                    xhr.setRequestHeader( 'Content-Type', 'application/json' );
-                    xhr.send( JSON.stringify( data ) );
-                };
-            </script>
-            <?php
-        } */
 
-        /**
-         * Log php errors
-         */
-        /* public function log_php_errors( $errno, $errstr, $errfile, $errline ) {
-            $error_data = array(
-                'type'    => $errno,
-                'message' => $errstr,
-                'file'    => $errfile,
-                'line'    => $errline
-            );
-            error_log( print_r( $error_data, true ) );
-        } */
-        
         /**
          * Add error page
          */
@@ -105,14 +69,33 @@ if(!class_exists('ERR_Error')){
         }
 
         public function display_errors() {
+            
+            ?>
+                <br>
+                <form method="post" action="">
+                    <input type="hidden" name="action" value="clean_debug_log">
+                    <button type="submit" class="button">Clean Debug Log</button>
+                </form> 
+                <br>
+                <code>error_log( 'Data Received: ' . print_r( $your_data, true ) );</code>    
+            <?php
+
+            if ( isset( $_POST['action'] ) && $_POST['action'] === 'clean_debug_log' ) {
+                $debug_log = WP_CONTENT_DIR . '/debug.log';
+                if ( file_exists( $debug_log ) ) {
+                    file_put_contents( $debug_log, '' );
+                }
+            }
+
             $debug_log = WP_CONTENT_DIR . '/debug.log';
+
             $output = '';
             if (file_exists($debug_log)) {
                 $debug_log_entries = file( $debug_log, FILE_IGNORE_NEW_LINES );
                 if(empty($debug_log_entries)){
                     ?>
                         <div class="wrap">
-                            <h1>Errors</h1>
+                            <h1>Errors</h1> 
                             <table class="wp-list-table widefat fixed striped">
                                 <thead>
                                     <tr>
@@ -153,11 +136,28 @@ if(!class_exists('ERR_Error')){
                     <?php
                 }
             } else {
-                $output .= '<h3>Debug log file not generated. Hense no error found yet</h3>';
+                $output .= '<h3>Debug log file not found. Hense no error found yet</h3>';
             }
             echo $output;
-            
         }
+
+        public function add_my_page_to_admin_bar($wp_admin_bar) {
+            // error_log('add_my_page_to_admin_bar called!');
+
+            $debug_log = WP_CONTENT_DIR . '/debug.log';
+            $error_count = 0;
+            if (file_exists($debug_log)) {
+                $debug_log_entries = file( $debug_log, FILE_IGNORE_NEW_LINES );
+                $error_count = count($debug_log_entries);
+            }
+
+            $wp_admin_bar->add_node( array(
+                'id'    => 'my-errors-page',
+                'title' => 'WP Errors-'. '<span style="color:red;font-weight:bold;" class="update-plugins count-' . $error_count . '"><span class="update-count">' . $error_count . '</span></span>',
+                'href'  => admin_url( 'tools.php?page=errors' ),
+            ) );
+        }
+
     
         /**
          * Activation Hook
