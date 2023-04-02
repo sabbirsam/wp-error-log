@@ -71,13 +71,24 @@ if(!class_exists('ERR_Error')){
             
             ?>
                 <br>
-                <form method="post" action="">
-                    <input type="hidden" name="action" value="clean_debug_log">
-                    <button type="submit" class="button">Clean Debug Log</button>
-                </form> 
+                <div class="wpel-buttons" style="display: flex; gap: 16px;">
+                    <form method="post" action="">
+                        <input type="hidden" name="action" value="clean_debug_log">
+                        <button type="submit" class="button">Clean Debug Log</button>
+                    </form> 
+                    <form method="post" action="">
+                        <input type="hidden" name="action" value="download_debug_log">
+                        <button type="submit" class="button">Download Debug Log</button>
+                    </form>
+                </div>
+
                 <br>
                 <code>error_log( 'Data Received: ' . print_r( $your_data, true ) );</code>    
             <?php
+
+            /**
+             * Clean Log
+             */
 
             if ( isset( $_POST['action'] ) && $_POST['action'] === 'clean_debug_log' ) {
                 $debug_log = WP_CONTENT_DIR . '/debug.log';
@@ -85,6 +96,34 @@ if(!class_exists('ERR_Error')){
                     file_put_contents( $debug_log, '' );
                 }
             }
+
+            /**
+             * Download
+             */
+
+             if ( isset( $_POST['action'] ) && $_POST['action'] === 'download_debug_log' ) {
+                $debug_log = WP_CONTENT_DIR . '/debug.log';
+                if (file_exists($debug_log)) {
+                    header('Content-Description: File Transfer');
+                    header('Content-Type: application/octet-stream');
+                    header('Content-Disposition: attachment; filename=' . basename($debug_log));
+                    header('Content-Transfer-Encoding: binary');
+                    header('Expires: 0');
+                    header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+                    header('Pragma: public');
+                    header('Content-Length: ' . filesize($debug_log));
+                    ob_clean();
+                    flush();
+                    readfile($debug_log);
+                    exit;
+                } else {
+                    echo 'Debug log file not found';
+                }
+            }
+
+             /**
+              * Show log in page
+              */
 
             $debug_log = WP_CONTENT_DIR . '/debug.log';
 
