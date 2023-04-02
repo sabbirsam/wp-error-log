@@ -39,7 +39,10 @@ if(!class_exists('ERR_Error')){
         public function __construct(){
             $this->includes();
             add_action( 'admin_menu', array( $this, 'add_error_page' ) );
+            // Register the Ajax handler
+            add_action( 'wp_ajax_my_errors_count', array( $this, 'my_errors_count_ajax_handler' ) );
             add_action( 'admin_bar_menu', array( $this, 'add_my_page_to_admin_bar' ), 100 );
+       
         }
 
         /**
@@ -175,10 +178,40 @@ if(!class_exists('ERR_Error')){
             echo $output;
         }
 
+        private function get_error_count() {
+            // Get the path to the debug log file
+            $debug_log = WP_CONTENT_DIR . '/debug.log';
+        
+            // Get the number of error lines in the debug log file
+            $error_count = 0;
+            if (file_exists($debug_log)) {
+                $debug_log_entries = file( $debug_log, FILE_IGNORE_NEW_LINES );
+                foreach ( $debug_log_entries as $entry ) {
+                    if ( strpos( $entry, 'PHP Error:' ) !== false ) {
+                        $error_count++;
+                    }
+                }
+            }
+        
+            return $error_count;
+        }
+
+        public function my_errors_count_ajax_handler() {
+            // Get the current error count
+            $error_count = $this->get_error_count();
+        
+            // Return the error count as JSON
+            wp_send_json_success( array(
+                'count' => $error_count,
+            ) );
+        }
+
+        
+
         public function add_my_page_to_admin_bar($wp_admin_bar) {
             // error_log('add_my_page_to_admin_bar called!');
 
-            $debug_log = WP_CONTENT_DIR . '/debug.log';
+            /* $debug_log = WP_CONTENT_DIR . '/debug.log';
             $error_count = 0;
             if (file_exists($debug_log)) {
                 $debug_log_entries = file( $debug_log, FILE_IGNORE_NEW_LINES );
@@ -189,8 +222,30 @@ if(!class_exists('ERR_Error')){
                 'id'    => 'my-errors-page',
                 'title' => 'WP Errors-'. '<span style="color:red;font-weight:bold;" class="update-plugins count-' . $error_count . '"><span class="update-count">' . $error_count . '</span></span>',
                 'href'  => admin_url( 'tools.php?page=errors' ),
+            ) ); */
+
+            $error_count = $this->get_error_count();
+
+            // Add the admin bar node
+            $wp_admin_bar->add_node( array(
+                'id'    => 'my-errors-page',
+                'title' => 'WP Errors-'. '<span style="color:red;font-weight:bold;" id="my-errors-page" class="update-plugins count-' . $error_count . '"><span class="update-count">' . $error_count . '</span></span>',
+                'href'  => admin_url( 'tools.php?page=errors' ),
             ) );
+
+            // Enqueue the Ajax script
+            wp_enqueue_script( 'my-errors-ajax', plugin_dir_url( __FILE__ ) . 'assets/my-errors-ajax.js', array( 'jquery' ), '1.0', true );
+
+            // Add the Ajax endpoint to the script
+            wp_localize_script( 'my-errors-ajax', 'myErrorsAjax', array(
+                'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+                'action' => 'my_errors_count',
+                'interval' => 5000, // Check for updates every 5 seconds
+            ) );
+
         }
+
+        
 
     
         /**
