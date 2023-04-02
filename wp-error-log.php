@@ -64,7 +64,6 @@ if(!class_exists('ERR_Error')){
          * Add error page
          */
         public function add_error_page() {
-            // add_menu_page( 'Errors', 'Errors', 'manage_options', 'errors', array( $this, 'display_errors' ), 'dashicons-warning', 90 );
             add_management_page( 'WP Errors', 'WP Errors', 'manage_options', 'errors', array( $this, 'display_errors' ) );
         }
 
