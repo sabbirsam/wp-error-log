@@ -1,26 +1,5 @@
 <?php
-/**
- * Plugin Name: WP Error Log
- *
- * @author            Sabbir Sam, devsabbirahmed
- * @copyright         2022- devsabbirahmed
- * @license           GPL-2.0-or-later
- *
- * @wordpress-plugin
- * Plugin Name: WP Error Log
- * Plugin URI: https://github.com/sabbirsam/Admin-Chat-Box/tree/free
- * Description: Logs JavaScript and PHP errors to a file and displays them on a page
- * Version:           1.0.0
- * Requires at least: 5.9 or higher
- * Requires PHP:      5.4 or higher
- * Author:            SABBIRSAM
- * Author URI:        https://github.com/sabbirsam/
- * Text Domain:       acb
- * Domain Path: /languages/
- * License:           GPL v2 or later
- * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- * 
- */
+
 
 defined('ABSPATH') or die('Hey, what are you doing here? You silly human!');
 
@@ -28,8 +7,6 @@ if (file_exists(dirname(__FILE__).'/vendor/autoload.php')) {
     require_once dirname(__FILE__).'/vendor/autoload.php';
 }
 
-use ERROR\Inc\ERR_Activate;
-use ERROR\Inc\ERR_Deactivate;
 
 /**
  * Main Class

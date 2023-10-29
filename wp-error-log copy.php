@@ -1,5 +1,6 @@
 <?php
 
+
 defined('ABSPATH') or die('Hey, what are you doing here? You silly human!');
 
 if (file_exists(dirname(__FILE__).'/vendor/autoload.php')) {
@@ -13,7 +14,7 @@ use ERROR\Inc\ERR_Deactivate;
  * Main Class
  */
 if(!class_exists('ERR_Error')){
-    class ERR_Errors{
+    class ERR_Error{
         public function __construct(){
             $this->includes();
             add_action( 'admin_menu', array( $this, 'add_error_page' ) );
@@ -49,7 +50,7 @@ if(!class_exists('ERR_Error')){
                     <form method="post" action="">
                         <input type="hidden" name="action" value="clean_debug_log">
                         <button type="submit" class="button">Clean Debug Log</button>
-                    </form> 
+                    </form>
                     <form method="post" action="">
                         <input type="hidden" name="action" value="download_debug_log">
                         <button type="submit" class="button">Download Debug Log</button>
@@ -57,8 +58,9 @@ if(!class_exists('ERR_Error')){
                 </div>
 
                 <br>
-                <code>error_log( 'Data Received: ' . print_r( $your_data, true ) );</code>    
-            <?php
+                <code>error_log( 'Data Received: ' . print_r( $your_data, true ) );</code>
+                <code>error_log( 'Data Received:-  ' );</code>
+                <?php
 
             /**
              * Clean Log
@@ -106,46 +108,46 @@ if(!class_exists('ERR_Error')){
                 $debug_log_entries = file( $debug_log, FILE_IGNORE_NEW_LINES );
                 if(empty($debug_log_entries)){
                     ?>
-                        <div class="wrap">
-                            <h1>Errors</h1> 
-                            <table class="wp-list-table widefat fixed striped">
-                                <thead>
-                                    <tr>
-                                        <th>Error Message</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Debug log empty. No error found</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    <?php
+<div class="wrap">
+    <h1>Errors</h1>
+    <table class="wp-list-table widefat fixed striped">
+        <thead>
+            <tr>
+                <th>Error Message</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Debug log empty. No error found</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<?php
                 }else{
                     ?>
-                        <div class="wrap">
-                            <h1>Errors</h1>
-                            <table class="wp-list-table widefat fixed striped">
-                                <thead>
-                                    <tr>
-                                        <th>Error Message</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                <?php
-                                    foreach ( $debug_log_entries as $data ) {
-                                    ?>
-                                        <tr>
-                                            <td><?php echo $data?></td>
-                                        </tr>
-                                    <?php
-                                    }
-                                ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    <?php
+<div class="wrap">
+    <h1>Errors</h1>
+    <table class="wp-list-table widefat fixed striped">
+        <thead>
+            <tr>
+                <th>Error Message</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+                foreach ( $debug_log_entries as $data ) {
+                ?>
+            <tr>
+                <td><?php echo $data?></td>
+            </tr>
+            <?php
+                }
+            ?>
+        </tbody>
+    </table>
+</div>
+<?php
                 }
             } else {
                 $output .= '<h3>Debug log file not found. Hense no error found yet</h3>';
@@ -187,8 +189,7 @@ if(!class_exists('ERR_Error')){
     /**
      * Instantiate an Object Class 
      */
-    $err = new ERR_Errors;
+    $err = new ERR_Error;
     register_activation_hook (__FILE__, array( $err, 'err_activate' ) );
     register_deactivation_hook (__FILE__, array( $err, 'err_deactivate' ) );
 }
-
