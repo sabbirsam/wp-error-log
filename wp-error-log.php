@@ -78,8 +78,10 @@ if(!class_exists('ERR_Error')){
             </div>
         
             <br>
-            <code>error_log( 'Data Received: ' . print_r( $your_data, true ) );</code>
-            <code>error_log( 'Data Received:-  ' );</code>
+            <code contenteditable="true">error_log( 'Data Received: ' . print_r( $your_data, true ) );</code>
+            <br>
+            <br>
+            <code contenteditable="true">error_log( 'Data Received:-  ' );</code>
             <?php
         
             /**
