@@ -76,8 +76,12 @@ if ( ! class_exists('ERR_Error') ) {
 
 					if ( $wp_debug ) {
 						$config_contents = preg_replace( '/define\s*\(\s*\'WP_DEBUG\'\s*,\s*true\s*\)\s*;/', "define('WP_DEBUG', false);", $config_contents );
+
+						$config_contents = preg_replace( '/define\s*\(\s*\'WP_DEBUG_LOG\'\s*,\s*true\s*\)\s*;/', "define('WP_DEBUG_LOG', false);", $config_contents );
 					} else {
 						$config_contents = preg_replace( '/define\s*\(\s*\'WP_DEBUG\'\s*,\s*false\s*\)\s*;/', "define('WP_DEBUG', true);", $config_contents );
+
+						$config_contents = preg_replace( '/define\s*\(\s*\'WP_DEBUG_LOG\'\s*,\s*false\s*\)\s*;/', "define('WP_DEBUG_LOG', true);", $config_contents );
 					}
 
 					file_put_contents( $config_path, $config_contents );
@@ -144,7 +148,7 @@ if ( ! class_exists('ERR_Error') ) {
 					<script>
 						var downloadLink = document.createElement('a');
 						// downloadLink.href = '<?php echo site_url('/wp-content/debug.log'); ?>';
-                        downloadLink.href = <?php echo json_encode( esc_url( site_url( "/wp-content/debug.log" ) ) ); ?>;
+						downloadLink.href = <?php echo json_encode( esc_url( site_url( '/wp-content/debug.log' ) ) ); ?>;
 						downloadLink.download = 'debug.log';
 						downloadLink.style.display = 'none';
 						document.body.appendChild(downloadLink);
