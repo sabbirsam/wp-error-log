@@ -115,23 +115,6 @@ if(!class_exists('ERR_Error')){
                 } else {
                     echo 'Debug log file not found';
                 }
-
-                /* if (file_exists($debug_log)) {
-                    header('Content-Description: File Transfer');
-                    header('Content-Type: application/octet-stream');
-                    header('Content-Disposition: attachment; filename=' . basename($debug_log));
-                    header('Content-Transfer-Encoding: binary');
-                    header('Expires: 0');
-                    header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-                    header('Pragma: public');
-                    header('Content-Length: ' . filesize($debug_log));
-                    ob_clean();
-                    flush();
-                    readfile($debug_log);
-                    exit;
-                } else {
-                    echo 'Debug log file not found';
-                } */
             }
         
             /**
