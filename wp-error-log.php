@@ -64,6 +64,10 @@ if(!class_exists('ERR_Error')){
         }
 
         public function display_errors() {
+
+            $wp_debug = ( defined( 'WP_DEBUG' ) && WP_DEBUG === true );
+            $mode = $wp_debug ? 'active' : 'inactive';
+            
             ?>
             <br>
             <div class="wpel-buttons" style="display: flex; gap: 16px;">
@@ -121,6 +125,7 @@ if(!class_exists('ERR_Error')){
              * Show log in page
              */
         
+           
             $debug_log = WP_CONTENT_DIR . '/debug.log';
         
             $output = '';
@@ -129,7 +134,8 @@ if(!class_exists('ERR_Error')){
                 if (empty($debug_log_entries)) {
                     ?>
                     <div class="wrap">
-                        <h1>Errors</h1>
+                        <h1>Debug mode: <span style="color: <?php echo $mode === 'active' ? 'red' : 'green'; ?>"><?php echo esc_html( $mode ); ?></span></h1>
+
                         <table class="wp-list-table widefat fixed striped">
                             <thead>
                                 <tr>
