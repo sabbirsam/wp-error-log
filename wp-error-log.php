@@ -67,6 +67,35 @@ if(!class_exists('ERR_Error')){
 
             $wp_debug = ( defined( 'WP_DEBUG' ) && WP_DEBUG === true );
             $mode = $wp_debug ? 'active' : 'inactive';
+            $status = $wp_debug ? 'ON' : 'OFF';
+
+            if ( isset( $_POST['toggle_debug_mode'] ) ) {
+                // Toggle the WP_DEBUG mode in wp-config.php
+                $config_path = ABSPATH . 'wp-config.php';
+                if ( file_exists( $config_path ) ) {
+                    $config_contents = file_get_contents( $config_path );
+        
+                    if ( $wp_debug ) {
+                        $config_contents = preg_replace( '/define\s*\(\s*\'WP_DEBUG\'\s*,\s*true\s*\)\s*;/', "define('WP_DEBUG', false);", $config_contents );
+                    } else {
+                        $config_contents = preg_replace( '/define\s*\(\s*\'WP_DEBUG\'\s*,\s*false\s*\)\s*;/', "define('WP_DEBUG', true);", $config_contents );
+                    }
+        
+                    file_put_contents( $config_path, $config_contents );
+
+                    ?>
+                    <!-- Reload the page to refresh  -->
+                    <script>
+                        window.location.reload(true);
+                    </script>
+                    <?php
+                    exit;
+        
+                    // Redirect to avoid form resubmission on page refresh
+                    wp_redirect( admin_url( 'tools.php?page=errors' ) );
+                    exit;
+                }
+            }
             
             ?>
             <br>
@@ -79,6 +108,12 @@ if(!class_exists('ERR_Error')){
                     <input type="hidden" name="action" value="download_debug_log">
                     <button type="submit" class="button">Download Debug Log</button>
                 </form>
+
+                <form method="post" action="">
+                    <input type="hidden" name="toggle_debug_mode" value="1">
+                    <button type="submit" class="button">Toggle Debug Mode: <span style="color: <?php echo $mode === 'active' ? 'red' : 'green'; ?>"><?php echo esc_html( $status ); ?></span></button>
+                </form>
+
             </div>
         
             <br>
