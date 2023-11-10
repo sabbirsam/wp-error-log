@@ -1,26 +1,5 @@
 <?php
-/**
- * Plugin Name: WP Error Log
- *
- * @author            Sabbir Sam, devsabbirahmed
- * @copyright         2022- devsabbirahmed
- * @license           GPL-2.0-or-later
- *
- * @wordpress-plugin
- * Plugin Name: WP Error Log
- * Plugin URI: https://github.com/sabbirsam/Admin-Chat-Box/tree/free
- * Description: Logs JavaScript and PHP errors to a file and displays them on a page
- * Version:           1.0.0
- * Requires at least: 5.9 or higher
- * Requires PHP:      5.4 or higher
- * Author:            SABBIRSAM
- * Author URI:        https://github.com/sabbirsam/
- * Text Domain:       acb
- * Domain Path: /languages/
- * License:           GPL v2 or later
- * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- * 
- */
+
 
 defined('ABSPATH') or die('Hey, what are you doing here? You silly human!');
 
@@ -78,10 +57,8 @@ if(!class_exists('ERR_Error')){
             </div>
         
             <br>
-            <code contenteditable="true">error_log( 'Data Received: ' . print_r( $your_data, true ) );</code>
-            <br>
-            <br>
-            <code contenteditable="true">error_log( 'Data Received:-  ' );</code>
+            <code>error_log( 'Data Received: ' . print_r( $your_data, true ) );</code>
+            <code>error_log( 'Data Received:-  ' );</code>
             <?php
         
             /**
@@ -194,6 +171,8 @@ if(!class_exists('ERR_Error')){
         
 
         public function add_my_page_to_admin_bar($wp_admin_bar) {
+            // error_log('add_my_page_to_admin_bar called!');
+
             $debug_log = WP_CONTENT_DIR . '/debug.log';
             $error_count = 0;
             if (file_exists($debug_log)) {
