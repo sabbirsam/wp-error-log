@@ -176,8 +176,6 @@ if(!class_exists('ERR_Error')){
         }
 
         public function add_my_page_to_admin_bar($wp_admin_bar) {
-            // error_log('add_my_page_to_admin_bar called!');
-
             $debug_log = WP_CONTENT_DIR . '/debug.log';
             $error_count = 0;
             if (file_exists($debug_log)) {
