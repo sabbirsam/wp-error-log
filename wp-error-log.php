@@ -59,6 +59,34 @@ if ( ! class_exists('ERR_Error') ) {
 		 * Add error page
 		 */
 		public function add_error_page() {
+			// Check if wp-config.php exists
+			$config_path = ABSPATH . 'wp-config.php';
+			if (file_exists($config_path)) {
+				$config_contents = file_get_contents($config_path);
+
+				// Check if both WP_DEBUG and WP_DEBUG_LOG are defined, if not, add them.
+				if (!preg_match('/define\s*\(\s*\'WP_DEBUG\'\s*,\s*([^\)]+)\);/s', $config_contents) ||
+					!preg_match('/define\s*\(\s*\'WP_DEBUG_LOG\'\s*,\s*([^\)]+)\);/s', $config_contents)) {
+					
+					// If WP_DEBUG is not defined, add it along with WP_DEBUG_LOG.
+					$replacement = "define('WP_DEBUG', false); define('WP_DEBUG_LOG', false);";
+
+					// Adjust the regular expression to match the existing WP_DEBUG line.
+					$pattern = '/define\s*\(\s*\'WP_DEBUG\'\s*,\s*([^;]+)\);\s*$/m';
+
+					if (preg_match($pattern, $config_contents, $matches)) {
+						// If WP_DEBUG is found, replace it with both definitions.
+						$config_contents = str_replace($matches[0], $replacement, $config_contents);
+					}
+				}
+
+				// Write the updated content back to wp-config.php
+				file_put_contents($config_path, $config_contents);
+			}
+
+			/**
+			 * Add WP Error Dashboard in Tools
+			 */
 			add_management_page( 'WP Errors', 'WP Errors', 'manage_options', 'errors', array( $this, 'display_errors' ) );
 		}
 
@@ -147,7 +175,6 @@ if ( ! class_exists('ERR_Error') ) {
 					?>
 					<script>
 						var downloadLink = document.createElement('a');
-						// downloadLink.href = '<?php echo site_url('/wp-content/debug.log'); ?>';
 						downloadLink.href = <?php echo json_encode( esc_url( site_url( '/wp-content/debug.log' ) ) ); ?>;
 						downloadLink.download = 'debug.log';
 						downloadLink.style.display = 'none';
