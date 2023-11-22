@@ -59,29 +59,34 @@ if ( ! class_exists('ERR_Error') ) {
 		 * Add error page
 		 */
 		public function add_error_page() {
-			// Check if wp-config.php exists
-			$config_path = ABSPATH . 'wp-config.php';
-			if (file_exists($config_path)) {
-				$config_contents = file_get_contents($config_path);
+			// Check if wp-config.php exists and add wp debug log and debug if not found
+			$debug_error_mode_enabled = get_option('debug_error_mode_enabled', 0);
+			if ($debug_error_mode_enabled == 0) {
+				$config_path = ABSPATH . 'wp-config.php';
+				if (file_exists($config_path)) {
+					$config_contents = file_get_contents($config_path);
 
-				// Check if both WP_DEBUG and WP_DEBUG_LOG are defined, if not, add them.
-				if (!preg_match('/define\s*\(\s*\'WP_DEBUG\'\s*,\s*([^\)]+)\);/s', $config_contents) ||
-					!preg_match('/define\s*\(\s*\'WP_DEBUG_LOG\'\s*,\s*([^\)]+)\);/s', $config_contents)) {
-					
-					// If WP_DEBUG is not defined, add it along with WP_DEBUG_LOG.
-					$replacement = "define('WP_DEBUG', false); define('WP_DEBUG_LOG', false);";
+					// Check if both WP_DEBUG and WP_DEBUG_LOG are defined, if not, add them.
+					if (!preg_match('/define\s*\(\s*\'WP_DEBUG\'\s*,\s*([^\)]+)\);/s', $config_contents) ||
+						!preg_match('/define\s*\(\s*\'WP_DEBUG_LOG\'\s*,\s*([^\)]+)\);/s', $config_contents)) {
+						
+						// If WP_DEBUG is not defined, add it along with WP_DEBUG_LOG.
+						$replacement = "define('WP_DEBUG', false); define('WP_DEBUG_LOG', false);";
 
-					// Adjust the regular expression to match the existing WP_DEBUG line.
-					$pattern = '/define\s*\(\s*\'WP_DEBUG\'\s*,\s*([^;]+)\);\s*$/m';
+						// Adjust the regular expression to match the existing WP_DEBUG line.
+						$pattern = '/define\s*\(\s*\'WP_DEBUG\'\s*,\s*([^;]+)\);\s*$/m';
 
-					if (preg_match($pattern, $config_contents, $matches)) {
-						// If WP_DEBUG is found, replace it with both definitions.
-						$config_contents = str_replace($matches[0], $replacement, $config_contents);
+						if (preg_match($pattern, $config_contents, $matches)) {
+							// If WP_DEBUG is found, replace it with both definitions.
+							$config_contents = str_replace($matches[0], $replacement, $config_contents);
+						}
 					}
-				}
 
-				// Write the updated content back to wp-config.php
-				file_put_contents($config_path, $config_contents);
+					// Write the updated content back to wp-config.php
+					file_put_contents($config_path, $config_contents);
+
+					update_option('debug_error_mode_enabled', 1);
+				}
 			}
 
 			/**
