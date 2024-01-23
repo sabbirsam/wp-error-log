@@ -8,6 +8,8 @@ Stable Tag: 1.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
+Effortlessly track and manage errors on your WordPress site. Streamline the debugging process with Easy Error Log.
+
 == Description ==
 
 Presenting "Easy Error Log" – Your Budget-Friendly Answer to Seamless Debugging for your WordPress site.
@@ -28,6 +30,10 @@ Experience hassle-free debugging by conveniently defining error modes and debug 
 After activating the plugin navigate to your Admin Dashboard > WP Error Log > Activate the plugin. 
 Active the debug log from Dashboard and enjoy receiving instant error while generate in website
 
+== Frequently Asked Questions == 
+= Do I need to manually define WP_DEBUG PHP constant =
+No, manual definition of the WP_DEBUG PHP constant is not necessary. Instead, you can directly add or modify it from the plugin dashboard page 
 
+== Changelog ==
 = 1.0.0 - =
 - Initial stable release
