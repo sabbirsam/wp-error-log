@@ -1,6 +1,6 @@
 === Easy Error Log ===
 Contributors: wpxpertise, devsabbirahmed
-Tags: error, log, debug
+Tags: error, log, debug, site error
 Requires at least: 5.9
 Tested up to: 6.4
 Requires PHP: 5.6
@@ -14,7 +14,7 @@ Presenting "Easy Error Log" – Your Budget-Friendly Answer to Seamless Debuggin
 
 Compatible with all major operating systems. No complex configurations required.
 
-Experience hassle-free debugging by conveniently defining error modes and debug log constants within the config file. No need to delve into core files – simply toggle the settings. Access all errors in a single, user-friendly dashboard page, making it effortless to identify and rectify issues. Keep your website running smoothly with the ability to clean up errors directly from the dashboard. Elevate your debugging experience with Easy Error Log.
+Experience hassle-free debugging by conveniently defining error modes and debug log constants within the config file. No need to delve into core files – simply toggle the settings. Access all errors in a single, user-friendly dashboard page, making it effortless to identify and rectify issues. Keep your website running smoothly with the ability to clean up and downloads error log directly from the dashboard. Elevate your debugging experience with Easy Error Log.
 
 == Screenshots ==
 1. Error Dashboard

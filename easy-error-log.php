@@ -27,8 +27,8 @@ if ( file_exists(__DIR__ . '/vendor/autoload.php') ) {
 	require_once __DIR__ . '/vendor/autoload.php';
 }
 
-use ERROR\Inc\ERR_Activate;
-use ERROR\Inc\ERR_Deactivate;
+use ERROR\Inc\ERR_Activate; //phpcs:ignore
+use ERROR\Inc\ERR_Deactivate;  //phpcs:ignore
 
 define( 'EASY_ERROR_LOG_VERSION', '1.0.0' );
 define( 'EASY_ERROR_LOG_FILE', __FILE__ );
@@ -41,7 +41,7 @@ if ( ! class_exists('ERR_Error') ) {
 	 */
 	class ERR_Error {
 		/**
-		 * This is __constructor 
+		 * This is __constructor
 		 */
 		public function __construct() {
 			$this->includes();
@@ -58,9 +58,9 @@ if ( ! class_exists('ERR_Error') ) {
 		}
 
 		/**
-		 * Enqueue plugin files 
-		 * 
-		 * $screen use to get the current page screen 
+		 * Enqueue plugin files.
+		 *
+		 * @param string $screen   use to get the current page screen.
 		 */
 		public function admin_enqueue( $screen ) {
 			if ( 'tools_page_errors' === $screen ) {
@@ -132,6 +132,9 @@ if ( ! class_exists('ERR_Error') ) {
 			add_management_page( 'WP Errors', 'WP Errors', 'manage_options', 'errors', array( $this, 'display_errors' ) );
 		}
 
+		/**
+		 * Display errors files.
+		 */
 		public function display_errors() {
 
 			$wp_debug = ( defined( 'WP_DEBUG' ) && WP_DEBUG === true );
@@ -293,9 +296,10 @@ if ( ! class_exists('ERR_Error') ) {
 			echo esc_html($output);
 		}
 
-
 		/**
-		 * Function it check debug log and add count errors
+		 * Function it check debug log and add count errors.
+		 *
+		 * @param string $wp_admin_bar   use to add error page in the admin bar.
 		 */
 		public function add_my_page_to_admin_bar( $wp_admin_bar ) {
 			$debug_log = WP_CONTENT_DIR . '/debug.log';
@@ -305,13 +309,12 @@ if ( ! class_exists('ERR_Error') ) {
 				$error_count = count($debug_log_entries);
 			}
 
-			$wp_admin_bar->add_node( array(
+			$wp_admin_bar->add_node(array(
 				'id'    => 'my-errors-page',
-				'title' => 'WP Errors-' . '<span style="color:red;font-weight:bold;" class="update-plugins count-' . $error_count . '"><span class="update-count">' . $error_count . '</span></span>',
-				'href'  => admin_url( 'tools.php?page=errors' ),
-			) );
+				'title' => "WP Errors-<span style='color:red;font-weight:bold;' class='update-plugins count-$error_count'><span class='update-count'>$error_count</span></span>",
+				'href'  => admin_url('tools.php?page=errors'),
+			));
 		}
-
 
 		/**
 		 * Activation Hook
