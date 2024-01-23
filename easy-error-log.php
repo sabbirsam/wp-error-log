@@ -1,15 +1,15 @@
 <?php
 /**
- * Plugin Name: WP Error Log
+ * Plugin Name: Easy Error Log
  *
  * @author            Sabbir Sam, devsabbirahmed
  * @copyright         2022- devsabbirahmed
  * @license           GPL-2.0-or-later
  *
  * @wordpress-plugin
- * Plugin Name: WP Error Log
+ * Plugin Name: Easy Error Log
  * Plugin URI: https://github.com/sabbirsam/Admin-Chat-Box/tree/free
- * Description: Logs JavaScript and PHP errors to a file and displays them on a page
+ * Description: Experience hassle-free debugging by conveniently defining error modes and debug log constants within the config file. No need to delve into core files – simply toggle the settings. Logs PHP errors and access all errors in a single, user-friendly dashboard page, making it effortless to identify and rectify issues.
  * Version:           1.0.0
  * Requires at least: 5.9 or higher
  * Requires PHP:      5.4 or higher
@@ -30,59 +30,96 @@ if ( file_exists(__DIR__ . '/vendor/autoload.php') ) {
 use ERROR\Inc\ERR_Activate;
 use ERROR\Inc\ERR_Deactivate;
 
-/**
- * Main Class
- */
+define( 'EASY_ERROR_LOG_VERSION', '1.0.0' );
+define( 'EASY_ERROR_LOG_FILE', __FILE__ );
+define( 'EASY_ERROR_LOG_DIR_URL', plugin_dir_url( __FILE__ ) );
+
+
 if ( ! class_exists('ERR_Error') ) {
+	/**
+	 * Main Class handaling ERR_Error.
+	 */
 	class ERR_Error {
+		/**
+		 * This is __constructor 
+		 */
 		public function __construct() {
 			$this->includes();
 			add_action( 'admin_menu', array( $this, 'add_error_page' ) );
+			add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue' ] );
 			add_action( 'admin_bar_menu', array( $this, 'add_my_page_to_admin_bar' ), 100 );
 		}
 
 		/**
-		 * Classes
+		 * Classes which include plugins loaded file.
 		 */
 		public function includes() {
 			add_action('plugins_loaded', array( $this, 'err_load' ));
 		}
 
 		/**
-		 * Language load
+		 * Enqueue plugin files 
+		 * 
+		 * $screen use to get the current page screen 
 		 */
-		function err_load() {
+		public function admin_enqueue( $screen ) {
+			if ( 'tools_page_errors' === $screen ) {
+				remove_all_actions( 'admin_notices' );
+				remove_all_actions( 'all_admin_notices' );
+
+				wp_enqueue_style(
+					'err-admin-css',
+					EASY_ERROR_LOG_DIR_URL . 'assets/easy-errors.css',
+					'',
+					time(),
+					'all'
+				);
+
+				wp_enqueue_script(
+					'err-admin-js',
+					EASY_ERROR_LOG_DIR_URL . 'assets/easy-errors.js',
+					[ 'jquery' ],
+					time(),
+					true
+				);
+			}
+		}
+
+		/**
+		 * Language load.
+		 */
+		public function err_load() {
 			load_plugin_textdomain('err', false,__DIR__ . 'languages');
 		}
 
 		/**
-		 * Add error page
+		 * Add error page.
 		 */
 		public function add_error_page() {
-			// Check if wp-config.php exists and add wp debug log and debug if not found
+			// Check if wp-config.php exists and add Easy Error Log and debug if not found.
 			$debug_error_mode_enabled = get_option('debug_error_mode_enabled', 0);
-			if ($debug_error_mode_enabled == 0) {
+			if ( 0 === $debug_error_mode_enabled ) {
 				$config_path = ABSPATH . 'wp-config.php';
-				if (file_exists($config_path)) {
+				if ( file_exists($config_path) ) {
 					$config_contents = file_get_contents($config_path);
 
 					// Check if both WP_DEBUG and WP_DEBUG_LOG are defined, if not, add them.
-					if (!preg_match('/define\s*\(\s*\'WP_DEBUG\'\s*,\s*([^\)]+)\);/s', $config_contents) ||
-						!preg_match('/define\s*\(\s*\'WP_DEBUG_LOG\'\s*,\s*([^\)]+)\);/s', $config_contents)) {
-						
+					if ( ! preg_match('/define\s*\(\s*\'WP_DEBUG\'\s*,\s*([^\)]+)\);/s', $config_contents) ||
+						! preg_match('/define\s*\(\s*\'WP_DEBUG_LOG\'\s*,\s*([^\)]+)\);/s', $config_contents) ) {
+
 						// If WP_DEBUG is not defined, add it along with WP_DEBUG_LOG.
 						$replacement = "define('WP_DEBUG', false); define('WP_DEBUG_LOG', false);";
 
 						// Adjust the regular expression to match the existing WP_DEBUG line.
 						$pattern = '/define\s*\(\s*\'WP_DEBUG\'\s*,\s*([^;]+)\);\s*$/m';
 
-						if (preg_match($pattern, $config_contents, $matches)) {
-							// If WP_DEBUG is found, replace it with both definitions.
+						if ( preg_match($pattern, $config_contents, $matches) ) {
+							// If WP_DEBUG mode found/active, replace it with both definitions.
 							$config_contents = str_replace($matches[0], $replacement, $config_contents);
 						}
 					}
 
-					// Write the updated content back to wp-config.php
+					// Write the updated content back to wp-config.php.
 					file_put_contents($config_path, $config_contents);
 
 					update_option('debug_error_mode_enabled', 1);
@@ -90,7 +127,7 @@ if ( ! class_exists('ERR_Error') ) {
 			}
 
 			/**
-			 * Add WP Error Dashboard in Tools
+			 * Add WP Error Dashboard in Tools.
 			 */
 			add_management_page( 'WP Errors', 'WP Errors', 'manage_options', 'errors', array( $this, 'display_errors' ) );
 		}
@@ -101,8 +138,9 @@ if ( ! class_exists('ERR_Error') ) {
 			$mode = $wp_debug ? 'active' : 'inactive';
 			$status = $wp_debug ? 'ON' : 'OFF';
 
-			if ( isset( $_POST['toggle_debug_mode'] ) && wp_verify_nonce( $_POST['toggle_debug_mode_nonce'], 'toggle_debug_mode_nonce' ) ) {
-				// Toggle the WP_DEBUG mode in wp-config.php
+			if ( isset( $_POST['toggle_debug_mode'], $_POST['toggle_debug_mode_nonce'] )
+				&& wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['toggle_debug_mode_nonce'] ) ), 'toggle_debug_mode_nonce' ) ) {
+				// Toggle the WP_DEBUG mode in wp-config.php.
 				$config_path = ABSPATH . 'wp-config.php';
 				if ( file_exists( $config_path ) ) {
 					$config_contents = file_get_contents( $config_path );
@@ -122,9 +160,9 @@ if ( ! class_exists('ERR_Error') ) {
 					?>
 					<!-- Reload the page to refresh  -->
 					<script>
-						setTimeout(function() {
-							window.location.reload(true);
-						}, 500); 
+					setTimeout(function() {
+						window.location.reload(true);
+					}, 500);
 					</script>
 					<?php
 					exit;
@@ -135,24 +173,25 @@ if ( ! class_exists('ERR_Error') ) {
 			<br>
 			<div class="wpel-buttons" style="display: flex; gap: 16px;">
 				<form method="post" action="">
-				<?php wp_nonce_field( 'clean_debug_log_nonce', 'clean_debug_log_nonce' ); ?>
+					<?php wp_nonce_field( 'clean_debug_log_nonce', 'clean_debug_log_nonce' ); ?>
 					<input type="hidden" name="action" value="clean_debug_log">
 					<button type="submit" class="button"><?php echo esc_html__( 'Clean Debug Log', 'err' ); ?></button>
 				</form>
 				<form method="post" action="">
-				<?php wp_nonce_field( 'download_debug_log_nonce', 'download_debug_log_nonce' ); ?>
+					<?php wp_nonce_field( 'download_debug_log_nonce', 'download_debug_log_nonce' ); ?>
 					<input type="hidden" name="action" value="download_debug_log">
 					<button type="submit" class="button"><?php echo esc_html__( 'Download Debug Log', 'err' ); ?></button>
 				</form>
 
 				<form method="post" action="">
-				<?php wp_nonce_field( 'toggle_debug_mode_nonce', 'toggle_debug_mode_nonce' ); ?>
+					<?php wp_nonce_field( 'toggle_debug_mode_nonce', 'toggle_debug_mode_nonce' ); ?>
 					<input type="hidden" name="toggle_debug_mode" value="1">
-					<button type="submit" class="button"><?php echo esc_html__( 'Toggle Debug Mode:', 'err' ); ?> <span style="color: <?php echo $mode === 'active' ? 'red' : 'green'; ?>"><?php echo esc_html( $status ); ?></span></button>
+					<button type="submit" class="button"><?php echo esc_html__( 'Toggle Debug Mode:', 'err' ); ?> <span
+							style="color: <?php echo 'active' === $mode ? 'red' : 'green'; ?>"><?php echo esc_html( $status ); ?></span></button>
 				</form>
 
 			</div>
-		
+
 			<br>
 			<code contenteditable="true">error_log( 'Data Received: ' . print_r( $, true ) );</code>
 			<br>
@@ -163,7 +202,7 @@ if ( ! class_exists('ERR_Error') ) {
 			/**
 			 * Clean Log
 			 */
-			if ( isset( $_POST['action'] ) && $_POST['action'] === 'clean_debug_log' && check_admin_referer( 'clean_debug_log_nonce', 'clean_debug_log_nonce' ) ) {
+			if ( isset( $_POST['action'] ) && 'clean_debug_log' === $_POST['action'] && check_admin_referer( 'clean_debug_log_nonce', 'clean_debug_log_nonce' ) ) {
 				$debug_log = WP_CONTENT_DIR . '/debug.log';
 				if ( file_exists($debug_log) ) {
 					file_put_contents($debug_log, '');
@@ -173,20 +212,20 @@ if ( ! class_exists('ERR_Error') ) {
 			/**
 			 * Download
 			 */
-			if ( isset( $_POST['action'] ) && $_POST['action'] === 'download_debug_log' && check_admin_referer( 'download_debug_log_nonce', 'download_debug_log_nonce' ) ) {
+			if ( isset( $_POST['action'] ) && 'download_debug_log' === $_POST['action'] && check_admin_referer( 'download_debug_log_nonce', 'download_debug_log_nonce' ) ) {
 				$debug_log = WP_CONTENT_DIR . '/debug.log';
 				if ( file_exists($debug_log) ) {
-					// JavaScript-based download
+					// JavaScript-based download.
 					?>
-					<script>
-						var downloadLink = document.createElement('a');
-						downloadLink.href = <?php echo json_encode( esc_url( site_url( '/wp-content/debug.log' ) ) ); ?>;
-						downloadLink.download = 'debug.log';
-						downloadLink.style.display = 'none';
-						document.body.appendChild(downloadLink);
-						downloadLink.click();
-						document.body.removeChild(downloadLink);
-					</script>
+				<script>
+				var downloadLink = document.createElement('a');
+				downloadLink.href = <?php echo json_encode( esc_url( site_url( '/wp-content/debug.log' ) ) ); ?>;
+				downloadLink.download = 'debug.log';
+				downloadLink.style.display = 'none';
+				document.body.appendChild(downloadLink);
+				downloadLink.click();
+				document.body.removeChild(downloadLink);
+				</script>
 					<?php
 				} else {
 					echo 'Debug log file not found';
@@ -204,46 +243,48 @@ if ( ! class_exists('ERR_Error') ) {
 				$debug_log_entries = file($debug_log, FILE_IGNORE_NEW_LINES);
 				if ( empty($debug_log_entries) ) {
 					?>
-					<div class="wrap">
-						<h1><?php echo esc_html__( 'Debug mode:', 'err' ); ?><span style="color: <?php echo $mode === 'active' ? 'red' : 'green'; ?>"><?php echo esc_html( $mode ); ?></span></h1>
+			<div class="wrap">
+				<h1><?php echo esc_html__( 'Debug mode:', 'err' ); ?><span
+						style="color: <?php echo 'active' === $mode ? 'red' : 'green'; ?>"><?php echo esc_html( $mode ); ?></span>
+				</h1>
 
-						<table class="wp-list-table widefat fixed striped">
-							<thead>
-								<tr>
-									<th><?php echo esc_html__( 'Error Message', 'err' ); ?></th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td><?php echo esc_html__( 'Debug log empty. No error found', 'err' ); ?></td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
+				<table class="wp-list-table widefat fixed striped">
+					<thead class="wp-error-head">
+						<tr class="wp-error-row">
+							<th class="wp-error-table-header"><?php echo esc_html__( 'Error Message', 'err' ); ?></th>
+						</tr>
+					</thead>
+					<tbody class="wp-error-body">
+						<tr class="wp-error-body-row">
+							<td class="wp-error-body-data"><?php echo esc_html__( 'Debug log empty. No error found', 'err' ); ?></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 					<?php
 				} else {
 					?>
-					<div class="wrap">
-						<h1><?php echo esc_html__( 'Errors', 'err' ); ?></h1>
-						<table class="wp-list-table widefat fixed striped">
-							<thead>
-								<tr>
-									<th><?php echo esc_html__( 'Error Message', 'err' ); ?></th>
-								</tr>
-							</thead>
-							<tbody>
-								<?php
-								foreach ( $debug_log_entries as $data ) {
-									?>
-									<tr>
-										<td><?php echo esc_html( $data ); ?></td>
-									</tr>
-									<?php
-								}
-								?>
-							</tbody>
-						</table>
-					</div>
+			<div class="wrap">
+				<h1><?php echo esc_html__( 'Errors', 'err' ); ?></h1>
+				<table class="wp-list-table widefat fixed striped">
+					<thead class="wp-error-head">
+						<tr class="wp-error-row wp-error-heading-text">
+							<th class="wp-error-table-header"><?php echo esc_html__( 'Error Message', 'err' ); ?></th>
+						</tr>
+					</thead>
+					<tbody class="wp-error-body">
+						<?php
+						foreach ( $debug_log_entries as $data ) {
+							?>
+						<tr class="wp-error-body-row">
+							<td class="wp-error-body-data"><?php echo esc_html( $data ); ?></td>
+						</tr>
+							<?php
+						}
+						?>
+					</tbody>
+				</table>
+			</div>
 					<?php
 				}
 			} else {
@@ -253,6 +294,9 @@ if ( ! class_exists('ERR_Error') ) {
 		}
 
 
+		/**
+		 * Function it check debug log and add count errors
+		 */
 		public function add_my_page_to_admin_bar( $wp_admin_bar ) {
 			$debug_log = WP_CONTENT_DIR . '/debug.log';
 			$error_count = 0;
@@ -272,13 +316,13 @@ if ( ! class_exists('ERR_Error') ) {
 		/**
 		 * Activation Hook
 		 */
-		function err_activate() {
+		public function err_activate() {
 			ERR_Activate::err_activate();
 		}
 		/**
 		 * Deactivation Hook
 		 */
-		function err_deactivate() {
+		public function err_deactivate() {
 			ERR_Deactivate::err_deactivate();
 		}
 	}

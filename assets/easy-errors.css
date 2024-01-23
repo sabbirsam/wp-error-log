@@ -1,0 +1,31 @@
+.wrap {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.wp-list-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+
+.wp-error-row,
+.wp-error-body-row {
+    display: table-row;
+}
+
+.wp-error-table-header,
+.wp-error-body-data {
+    display: table-cell;
+    border: 1px solid #e5e5e5;
+    padding: 8px;
+    text-align: left;
+}
+
+.wp-error-heading-text {
+    position: sticky;
+    top: 0;
+    background-color: #f5f5f5;
+    z-index: 100; 
+}
