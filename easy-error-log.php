@@ -8,14 +8,14 @@
  *
  * @wordpress-plugin
  * Plugin Name: Easy Error Log
- * Plugin URI: https://github.com/sabbirsam/Admin-Chat-Box/tree/free
+ * Plugin URI: https://github.com/sabbirsam/wp-error-log
  * Description: Experience hassle-free debugging by conveniently defining error modes and debug log constants within the config file. No need to delve into core files – simply toggle the settings. Logs PHP errors and access all errors in a single, user-friendly dashboard page, making it effortless to identify and rectify issues.
  * Version:           1.0.0
  * Requires at least: 5.9 or higher
  * Requires PHP:      5.4 or higher
  * Author:            SABBIRSAM
  * Author URI:        https://github.com/sabbirsam/
- * Text Domain:       err
+ * Text Domain:       easy-error-log
  * Domain Path: /languages/
  * License:           GPL v2 or later
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
@@ -27,19 +27,19 @@ if ( file_exists(__DIR__ . '/vendor/autoload.php') ) {
 	require_once __DIR__ . '/vendor/autoload.php';
 }
 
-use ERROR\Inc\ERR_Activate; //phpcs:ignore
-use ERROR\Inc\ERR_Deactivate;  //phpcs:ignore
+use EEL\Inc\EEL_Activate; //phpcs:ignore
+use EEL\Inc\EEL_Deactivate;  //phpcs:ignore
 
 define( 'EASY_ERROR_LOG_VERSION', '1.0.0' );
 define( 'EASY_ERROR_LOG_FILE', __FILE__ );
 define( 'EASY_ERROR_LOG_DIR_URL', plugin_dir_url( __FILE__ ) );
 
 
-if ( ! class_exists('ERR_Error') ) {
+if ( ! class_exists('EEL_Error') ) {
 	/**
-	 * Main Class handaling ERR_Error.
+	 * Main Class handaling EEL_Error.
 	 */
-	class ERR_Error {
+	class EEL_Error {
 		/**
 		 * This is __constructor
 		 */
@@ -54,7 +54,7 @@ if ( ! class_exists('ERR_Error') ) {
 		 * Classes which include plugins loaded file.
 		 */
 		public function includes() {
-			add_action('plugins_loaded', array( $this, 'err_load' ));
+			add_action('plugins_loaded', array( $this, 'eel_load' ));
 		}
 
 		/**
@@ -88,8 +88,8 @@ if ( ! class_exists('ERR_Error') ) {
 		/**
 		 * Language load.
 		 */
-		public function err_load() {
-			load_plugin_textdomain('err', false,__DIR__ . 'languages');
+		public function eel_load() {
+			load_plugin_textdomain('easy-error-log', false,__DIR__ . 'languages');
 		}
 
 		/**
@@ -97,7 +97,7 @@ if ( ! class_exists('ERR_Error') ) {
 		 */
 		public function add_error_page() {
 			// Check if wp-config.php exists and add Easy Error Log and debug if not found.
-			$debug_error_mode_enabled = get_option('debug_error_mode_enabled', 0);
+			$debug_error_mode_enabled = get_option('easy_error_log_debug_mode_enabled', 0);
 			if ( 0 === $debug_error_mode_enabled ) {
 				$config_path = ABSPATH . 'wp-config.php';
 				if ( file_exists($config_path) ) {
@@ -122,7 +122,7 @@ if ( ! class_exists('ERR_Error') ) {
 					// Write the updated content back to wp-config.php.
 					file_put_contents($config_path, $config_contents);
 
-					update_option('debug_error_mode_enabled', 1);
+					update_option('easy_error_log_debug_mode_enabled', 1);
 				}
 			}
 
@@ -178,19 +178,25 @@ if ( ! class_exists('ERR_Error') ) {
 				<form method="post" action="">
 					<?php wp_nonce_field( 'clean_debug_log_nonce', 'clean_debug_log_nonce' ); ?>
 					<input type="hidden" name="action" value="clean_debug_log">
-					<button type="submit" class="button"><?php echo esc_html__( 'Clean Debug Log', 'err' ); ?></button>
+					<button type="submit" class="button"><?php echo esc_html__( 'Clean Debug Log', 'easy-error-log' ); ?></button>
 				</form>
 				<form method="post" action="">
 					<?php wp_nonce_field( 'download_debug_log_nonce', 'download_debug_log_nonce' ); ?>
 					<input type="hidden" name="action" value="download_debug_log">
-					<button type="submit" class="button"><?php echo esc_html__( 'Download Debug Log', 'err' ); ?></button>
+					<button type="submit" class="button"><?php echo esc_html__( 'Download Debug Log', 'easy-error-log' ); ?></button>
 				</form>
 
 				<form method="post" action="">
 					<?php wp_nonce_field( 'toggle_debug_mode_nonce', 'toggle_debug_mode_nonce' ); ?>
 					<input type="hidden" name="toggle_debug_mode" value="1">
-					<button type="submit" class="button"><?php echo esc_html__( 'Toggle Debug Mode:', 'err' ); ?> <span
-							style="color: <?php echo 'active' === $mode ? 'red' : 'green'; ?>"><?php echo esc_html( $status ); ?></span></button>
+
+					<button type="submit" class="button">
+						<?php echo esc_html__( 'Toggle Debug Mode:', 'easy-error-log' ); ?>
+						<span style="color: <?php echo esc_html( 'active' === $mode ? 'red' : 'green' ); ?>">
+							<?php echo esc_html( $status ); ?>
+						</span>
+					</button>
+
 				</form>
 
 			</div>
@@ -222,7 +228,7 @@ if ( ! class_exists('ERR_Error') ) {
 					?>
 				<script>
 				var downloadLink = document.createElement('a');
-				downloadLink.href = <?php echo json_encode( esc_url( site_url( '/wp-content/debug.log' ) ) ); ?>;
+				downloadLink.href = <?php echo wp_json_encode( esc_url( site_url( '/wp-content/debug.log' ) ) ); ?>;
 				downloadLink.download = 'debug.log';
 				downloadLink.style.display = 'none';
 				document.body.appendChild(downloadLink);
@@ -231,7 +237,7 @@ if ( ! class_exists('ERR_Error') ) {
 				</script>
 					<?php
 				} else {
-					echo 'Debug log file not found';
+					echo esc_html__( 'Debug log file not found:', 'easy-error-log' );
 				}
 			}
 
@@ -247,19 +253,23 @@ if ( ! class_exists('ERR_Error') ) {
 				if ( empty($debug_log_entries) ) {
 					?>
 			<div class="wrap">
-				<h1><?php echo esc_html__( 'Debug mode:', 'err' ); ?><span
-						style="color: <?php echo 'active' === $mode ? 'red' : 'green'; ?>"><?php echo esc_html( $mode ); ?></span>
+				<h1>
+					<?php echo esc_html__( 'Debug mode:', 'easy-error-log' ); ?>
+					<span style="color: <?php echo esc_html( 'active' === $mode ? 'red' : 'green' ); ?>">
+						<?php echo esc_html( $mode ); ?>
+					</span>
 				</h1>
+
 
 				<table class="wp-list-table widefat fixed striped">
 					<thead class="wp-error-head">
 						<tr class="wp-error-row">
-							<th class="wp-error-table-header"><?php echo esc_html__( 'Error Message', 'err' ); ?></th>
+							<th class="wp-error-table-header"><?php echo esc_html__( 'Error Message', 'easy-error-log' ); ?></th>
 						</tr>
 					</thead>
 					<tbody class="wp-error-body">
 						<tr class="wp-error-body-row">
-							<td class="wp-error-body-data"><?php echo esc_html__( 'Debug log empty. No error found', 'err' ); ?></td>
+							<td class="wp-error-body-data"><?php echo esc_html__( 'Debug log empty. No error found', 'easy-error-log' ); ?></td>
 						</tr>
 					</tbody>
 				</table>
@@ -268,11 +278,11 @@ if ( ! class_exists('ERR_Error') ) {
 				} else {
 					?>
 			<div class="wrap">
-				<h1><?php echo esc_html__( 'Errors', 'err' ); ?></h1>
+				<h1><?php echo esc_html__( 'Errors', 'easy-error-log' ); ?></h1>
 				<table class="wp-list-table widefat fixed striped">
 					<thead class="wp-error-head">
 						<tr class="wp-error-row wp-error-heading-text">
-							<th class="wp-error-table-header"><?php echo esc_html__( 'Error Message', 'err' ); ?></th>
+							<th class="wp-error-table-header"><?php echo esc_html__( 'Error Message', 'easy-error-log' ); ?></th>
 						</tr>
 					</thead>
 					<tbody class="wp-error-body">
@@ -319,20 +329,20 @@ if ( ! class_exists('ERR_Error') ) {
 		/**
 		 * Activation Hook
 		 */
-		public function err_activate() {
-			ERR_Activate::err_activate();
+		public function eel_activate() {
+			EEL_Activate::eel_activate();
 		}
 		/**
 		 * Deactivation Hook
 		 */
-		public function err_deactivate() {
-			ERR_Deactivate::err_deactivate();
+		public function eel_deactivate() {
+			EEL_Deactivate::eel_deactivate();
 		}
 	}
 	/**
 	 * Instantiate an Object Class
 	 */
-	$err = new ERR_Error();
-	register_activation_hook (__FILE__, array( $err, 'err_activate' ) );
-	register_deactivation_hook (__FILE__, array( $err, 'err_deactivate' ) );
+	$err = new EEL_Error();
+	register_activation_hook (__FILE__, array( $err, 'eel_activate' ) );
+	register_deactivation_hook (__FILE__, array( $err, 'eel_deactivate' ) );
 }

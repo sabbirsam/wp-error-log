@@ -4,21 +4,21 @@
  *
  * This class is used to builds all of the tables when the plugin is Deactivated
  *
- * @package ERROR\Inc
+ * @package EEL\Inc
  */
-namespace ERROR\Inc;
+namespace EEL\Inc;
 
 defined('ABSPATH') || die('Hey, what are you doing here? You silly human!');
 
 /**
  * Deactivated plugin
  */
-class ERR_Deactivate {
+class EEL_Deactivate {
 
 	/**
 	 * This function use to deactivate the plugin and run after deactivate
 	 */
-	public static function err_deactivate() {
+	public static function eel_deactivate() {
 		flush_rewrite_rules();
 	}
 }

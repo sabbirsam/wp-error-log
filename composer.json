@@ -2,7 +2,7 @@
     "name": "samiu/error",
     "autoload": {
         "psr-4": {
-            "ERROR\\Inc\\": "inc/"
+            "EEL\\Inc\\": "inc/"
         }
     },
     "authors": [

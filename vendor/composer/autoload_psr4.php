@@ -6,5 +6,5 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'ERROR\\Inc\\' => array($baseDir . '/inc'),
+    'EEL\\Inc\\' => array($baseDir . '/inc'),
 );
