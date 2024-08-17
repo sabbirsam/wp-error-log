@@ -10,7 +10,7 @@
 	<rule ref="WordPress.WP.I18n">
 		<properties>
 			<property name="text_domain" type="array">
-				<element value="err"/>
+				<element value="easy-error-log"/>
 			</property>
 		</properties>
 	</rule>

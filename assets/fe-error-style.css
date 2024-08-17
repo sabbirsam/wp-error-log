@@ -1,0 +1,84 @@
+.error-log-container {
+    background: linear-gradient(0deg, hsla(0, 0%, 100%, .2), hsla(0, 0%, 100%, .2)), linear-gradient(270deg, #7f3fff -.37%, #ff1bbe 77.15%);
+    border-bottom-left-radius: 12px;
+    border-top-left-radius: 12px;
+    overflow: hidden;
+    position: fixed;
+    right: 0;
+    top: 20%;
+    transition: all .3s ease;
+    z-index: 11;
+
+    /* display: flex;
+    right: -128px; */
+
+}
+
+.error-log-header {
+    background-color: #0073aa;
+    color: #fff;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+button#error-log-toggle {
+    background: unset;
+    border: unset;
+    box-shadow: none;
+}
+
+.error-log-toggle {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.error-log-content {
+    display: none;
+    padding: 15px;
+    max-height: 360px;
+    overflow-y: auto;
+    background-color: #f9f9f9;  
+}
+
+.error-log-content::-webkit-input-placeholder {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 21px;
+    color: #0073aa;
+}
+
+.error-log-content:-ms-input-placeholder {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 21px;
+    color: #0073aa;
+}
+
+.error-log-content::placeholder {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 21px;
+    color: #666873;
+}
+
+
+.error-log-container.open .error-log-content {
+    display: block;
+}
+
+.error-log-container.open .error-log-toggle {
+    transform: rotate(45deg);
+}
+
+.error-log-container.closed .error-log-content {
+    display: none;
+}

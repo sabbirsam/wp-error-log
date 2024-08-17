@@ -1,31 +1,172 @@
-.wrap {
-    max-height: 500px;
-    overflow-y: auto;
+.nav-tab:focus{
+    box-shadow: none;
+}
+.tab-content {
+    margin: 10px;
+}
+.wpel-buttons {
+    margin-top: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
 }
 
-.wp-list-table {
+.wpel-buttons .button {
+    background-color: #ff17177d;
+    border: none;
+    color: #ffffff;
+    padding: 2px 10px;
+    font-size: 15px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+.wpel-buttons .button:hover {
+    background-color: #f61b1b93;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    color: #ffffff;
+}
+
+.wpel-buttons .button:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #0073aa, 0 0 0 4px rgba(0, 115, 170, 0.2);
+}
+
+/* Debug constant  */
+.debug-constant {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.code-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.copy-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: #0073aa; 
+    transition: color 0.3s ease;
+}
+
+.copy-btn:hover {
+    color: #005177; 
+}
+
+code {
+    background: #f5f5f5;
+    padding: 5px;
+    border-radius: 3px;
+    font-family: monospace;
+    white-space: pre-wrap;
+}
+
+/* Debug constant End */
+
+.status {
+    display: flex;
+    gap: 35px;
+}
+h4.eel-title {
+    color: #ff6a00;
+    font-size: 1.3em;
+    margin: 1em 0px 10px 1px;
+}
+
+
+@media (max-width: 768px) {
+    .wpel-buttons .button {
+        font-size: 12px;
+        padding: 8px 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .wpel-buttons {
+        gap: 8px;
+    }
+
+    .wpel-buttons .button {
+        flex: 1 1 100%;
+        text-align: center;
+        padding: 12px;
+    }
+}
+
+/* Table  */
+
+.theme-info-table, .plugins-info-table {
+    margin-top: 15px;
     width: 100%;
     border-collapse: collapse;
-    margin-top: 10px;
+    background-color: #fff;
 }
 
-
-.wp-error-row,
-.wp-error-body-row {
-    display: table-row;
-}
-
-.wp-error-table-header,
-.wp-error-body-data {
-    display: table-cell;
-    border: 1px solid #e5e5e5;
-    padding: 8px;
+.theme-info-table th, .plugins-info-table th,
+.theme-info-table td, .plugins-info-table td {
+    padding: 12px;
+    border: 1px solid #ddd;
     text-align: left;
 }
 
-.wp-error-heading-text {
-    position: sticky;
-    top: 0;
-    background-color: #f5f5f5;
-    z-index: 100; 
+.theme-info-table th, .plugins-info-table th {
+    background-color: #f1f1f1;
+    font-weight: bold;
+}
+
+.theme-info-table tbody tr:nth-child(odd), .plugins-info-table tbody tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+
+.theme-info-table tbody tr:hover, .plugins-info-table tbody tr:hover {
+    background-color: #e0e0e0;
+}
+
+.theme-info-table tbody td a, .plugins-info-table tbody td a {
+    color: #0073aa;
+    text-decoration: none;
+}
+
+.theme-info-table tbody td a:hover, .plugins-info-table tbody td a:hover {
+    text-decoration: underline;
+}
+
+
+
+
+/* Error log panel  */
+.error-log-scrollable {
+    max-height: 300px; 
+    overflow-y: auto;
+    padding: 10px;
+    border: 1px solid #ccd0d4;
+    background-color: #f7f7f7;
+    border-radius: 4px;
+}
+
+.wp-error-body-data {
+    padding: 0;
+}
+
+.wp-error-body p {
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .error-log-scrollable {
+        max-height: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .error-log-scrollable {
+        max-height: 150px; 
+    }
 }
